@@ -32,10 +32,16 @@ namespace classic_computer_science_problems
 
             /*
             Console.WriteLine("masiel " + "amor");
-            //Console.WriteLine(insercionesPalindromo("abcb", 0));
-            //Console.WriteLine(insercionesPalindromo("abecba", 0));
-            */
+            //Console.WriteLine(insercionesPalindromo1("abcb", 0));
+            //Console.WriteLine(insercionesPalindromo1("abecba", 0));
             
+            // "zzazz"
+            */
+
+            Console.WriteLine(insercionesPalindromo2("leetcode"));
+
+            //Console.WriteLine(5 % 2);
+            //Console.WriteLine(6 % 2);
         }
 
         static long numeroMasGrande(int n)
@@ -79,6 +85,23 @@ namespace classic_computer_science_problems
             return serie[n - 1];
         }
 
+        static int fibonacciLeetcode(int n)
+        {
+            if (n == 0) return 0;
+            if (n == 1) return 1;
+
+            int ultimo = 1;
+            int penultimo = 0;
+            
+            for (int i = 2; i < n; i++)
+            {
+                int temp = ultimo;
+                ultimo = ultimo + penultimo;
+                penultimo = temp;
+            }
+            return ultimo;
+        }
+
         class Fibonacci
         {
             Dictionary<int, long> serie;
@@ -110,7 +133,8 @@ namespace classic_computer_science_problems
          * Numero de letras que se deben insertar para convertir
          * una cadena en palindromo
          */
-        static int insercionesPalindromo(string cadena, int deep)
+         // Time limit exceeded. Leetcode.
+        static int insercionesPalindromo1(string s, int deep)
         {
             Func<string, int, string> compose = null;
             compose = (string str, int times) => {
@@ -118,12 +142,34 @@ namespace classic_computer_science_problems
                 else return "";
             };
 
-            Console.WriteLine("{0}{1}", compose("-", deep), cadena);
-            if (cadena.Length < 2) return 0;
-            if (cadena[0] == cadena[cadena.Length - 1]) return insercionesPalindromo(cadena.Substring(1, cadena.Length - 2), deep + 1);
-            int way1 = insercionesPalindromo(cadena.Substring(0, cadena.Length - 1), deep + 1);
-            int way2 = insercionesPalindromo(cadena.Substring(1, cadena.Length - 1), deep + 1);
+            if (s.Length < 2) return 0;
+
+            HashSet<char> set = new HashSet<char>(s);
+            if (set.Count() == s.Length) return s.Length - 1;
+
+            Console.WriteLine("{0}{1}", compose("-", deep), s);
+            if (s[0] == s[s.Length - 1]) return insercionesPalindromo1(s.Substring(1, s.Length - 2), deep + 1);
+            int way1 = insercionesPalindromo1(s.Substring(0, s.Length - 1), deep + 1);
+            int way2 = insercionesPalindromo1(s.Substring(1, s.Length - 1), deep + 1);
             return Math.Min(way1, way2) + 1;
+        }
+
+        // Acepted! Leetcode. :)
+        static int insercionesPalindromo2(string s)
+        {
+            int[,] dp = new int[s.Length + 1, s.Length];
+
+            for (int i = 2; i < s.Length + 1; i++)
+            {
+                for (int j = 0; j < s.Length - i + 1; j++)
+                {
+                    //Console.WriteLine("i={0}    j={1}", i, j);
+                    if (s[j] == s[j + i - 1]) dp[i, j] = dp[i - 2, j + 1];
+                    else dp[i, j] = Math.Min(dp[i - 1, j + 1], dp[i - 1, j]) + 1;
+                }
+            }
+
+            return dp[s.Length, 0];
         }
     }
 }
