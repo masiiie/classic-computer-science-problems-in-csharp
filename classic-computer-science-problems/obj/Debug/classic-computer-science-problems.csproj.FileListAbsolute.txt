@@ -5,3 +5,10 @@ C:\Users\Masi\Documents\GitHub\classic-computer-science-problems-in-csharp\class
 C:\Users\Masi\Documents\GitHub\classic-computer-science-problems-in-csharp\classic-computer-science-problems\classic-computer-science-problems\obj\Debug\classic-computer-science-problems.csproj.CoreCompileInputs.cache
 C:\Users\Masi\Documents\GitHub\classic-computer-science-problems-in-csharp\classic-computer-science-problems\classic-computer-science-problems\obj\Debug\classic-computer-science-problems.exe
 C:\Users\Masi\Documents\GitHub\classic-computer-science-problems-in-csharp\classic-computer-science-problems\classic-computer-science-problems\obj\Debug\classic-computer-science-problems.pdb
+C:\Users\Masi\Documents\GitHub\classic-computer-science-problems-in-csharp\classic-computer-science-problems\bin\Debug\classic-computer-science-problems.exe.config
+C:\Users\Masi\Documents\GitHub\classic-computer-science-problems-in-csharp\classic-computer-science-problems\bin\Debug\classic-computer-science-problems.exe
+C:\Users\Masi\Documents\GitHub\classic-computer-science-problems-in-csharp\classic-computer-science-problems\bin\Debug\classic-computer-science-problems.pdb
+C:\Users\Masi\Documents\GitHub\classic-computer-science-problems-in-csharp\classic-computer-science-problems\obj\Debug\classic-computer-science-problems.csprojResolveAssemblyReference.cache
+C:\Users\Masi\Documents\GitHub\classic-computer-science-problems-in-csharp\classic-computer-science-problems\obj\Debug\classic-computer-science-problems.csproj.CoreCompileInputs.cache
+C:\Users\Masi\Documents\GitHub\classic-computer-science-problems-in-csharp\classic-computer-science-problems\obj\Debug\classic-computer-science-problems.exe
+C:\Users\Masi\Documents\GitHub\classic-computer-science-problems-in-csharp\classic-computer-science-problems\obj\Debug\classic-computer-science-problems.pdb

@@ -10,6 +10,7 @@ namespace classic_computer_science_problems
     {
         static void Main(string[] args)
         {
+            /*
             Console.WriteLine(Math.Pow(2, 32));
             //long a = 1836311903 + 1134903170;
             //Console.Write("{0}", a);
@@ -26,7 +27,15 @@ namespace classic_computer_science_problems
                 // fib48 = 2971215073
                 // 2^32 = 4294967296
                 Console.Write("fib{0} = {1}\n", i + 1, fib.calculate(i + 1));
-            }            
+            }   
+            */
+
+            /*
+            Console.WriteLine("masiel " + "amor");
+            //Console.WriteLine(insercionesPalindromo("abcb", 0));
+            //Console.WriteLine(insercionesPalindromo("abecba", 0));
+            */
+            
         }
 
         static long numeroMasGrande(int n)
@@ -51,6 +60,11 @@ namespace classic_computer_science_problems
 
         static int fibonacci2(int n)
         {
+            /*
+             * Aqui el array es innecesario
+             * Se puede expresar con dos variables: ultimo y penultimo
+             * e ir swapeando
+             */
             Console.WriteLine("fibonacci de: {0}", n);
             if (n == 1) return 0;
             if (n < 4) return 1;
@@ -90,6 +104,26 @@ namespace classic_computer_science_problems
 
                 return serie[n];
             }
+        }
+
+        /*
+         * Numero de letras que se deben insertar para convertir
+         * una cadena en palindromo
+         */
+        static int insercionesPalindromo(string cadena, int deep)
+        {
+            Func<string, int, string> compose = null;
+            compose = (string str, int times) => {
+                if (times > 0) return str + compose(str, times - 1);
+                else return "";
+            };
+
+            Console.WriteLine("{0}{1}", compose("-", deep), cadena);
+            if (cadena.Length < 2) return 0;
+            if (cadena[0] == cadena[cadena.Length - 1]) return insercionesPalindromo(cadena.Substring(1, cadena.Length - 2), deep + 1);
+            int way1 = insercionesPalindromo(cadena.Substring(0, cadena.Length - 1), deep + 1);
+            int way2 = insercionesPalindromo(cadena.Substring(1, cadena.Length - 1), deep + 1);
+            return Math.Min(way1, way2) + 1;
         }
     }
 }
