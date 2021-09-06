@@ -171,5 +171,58 @@ namespace classic_computer_science_problems
 
             return dp[s.Length, 0];
         }
+
+
+        // Sorting
+
+        static void burbuja<T>(T[] array) where T:IComparable
+        {
+            for (int i = 0; i < array.Length; i++)
+            {
+                for (int j = 0; j < array.Length - i - 1; j++)
+                {
+                    if(array[j].CompareTo(array[j + 1]) == 1)
+                    {
+                        T temp = array[j];
+                        array[j] = array[j + 1];
+                        array[j + 1] = temp;
+                    }
+                }
+            }
+        }
+
+        static void minimos_sucesivos<T>(T[] array) where T:IComparable
+        {
+            for (int i = 0; i < array.Length; i++)
+            {
+                int min_index = i;
+                for (int j = i + 1; j < array.Length; j++)
+                {
+                    if (array[j].CompareTo(array[min_index]) == -1) min_index = j;
+                }
+
+                T temp = array[i];
+                array[i] = array[min_index];
+                array[min_index] = temp;
+            }
+        }
+
+        static void ordenacion_por_insercion<T>(T[] array) where T:IComparable
+        {
+            for (int i = 1; i < array.Length; i++)
+            {
+
+                for (int j = i; j > 0; j--)
+                {
+                    if (array[j].CompareTo(array[j - 1]) == -1)
+                    {
+                        T temp = array[j];
+                        array[j] = array[j - 1];
+                        array[j - 1] = temp;
+                    }
+                    else break;
+                }
+            }
+        }
     }
 }
