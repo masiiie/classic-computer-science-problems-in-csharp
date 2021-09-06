@@ -172,6 +172,71 @@ namespace classic_computer_science_problems
             return dp[s.Length, 0];
         }
 
+        /*
+         Idea:
+            - Mover al auxiliar n-1 discos
+            - Mover el mayor que esta en origen a destino
+            - Mover los n-1 que estan en auxiliar a destino
+
+        Mientras mayor sea el valor del numero en la pila significa que menor 
+        es el disco.
+        */
+        static void Hanoi_Towers(Stack<int> source, Stack<int> auxiliar, Stack<int> destiny, int n)
+        {
+            // A:source B:auxiliar C:destiny
+            // base case
+            if (n == 2)
+            {
+                auxiliar.Push(source.Pop());
+                destiny.Push(source.Pop());
+                destiny.Push(auxiliar.Pop());
+            }
+            else
+            {
+                Hanoi_Towers(source, destiny, auxiliar, n - 1);
+                destiny.Push(source.Pop());
+                Hanoi_Towers(auxiliar, source, destiny, n - 1);
+            }
+        }
+
+        /*
+         - costos es una matriz de nxn
+         - Las ciudades son solo los indices de la matriz: 0,1,2,...n
+         - El array camino inicialmente es 0,1,2...n
+        */
+        static int Naive_Traveling_Salesman_Problem(int[,] costos, out int[] camino)
+        {
+            camino = new int[costos.Length];
+            for (int i = 0; i < costos.Length; i++) camino[i] = -1;
+            return Naive_Traveling_Salesman_Problem_aux(costos, camino, 0, 0);
+        }
+
+        static int Naive_Traveling_Salesman_Problem_aux(int[,] costos, int[] camino, int step, int costo)
+        {
+            if (step == costos.Length) return costo;
+
+            List<int> allCities = new List<int>();
+            for (int i = 0; i < costos.Length; i++) allCities.Add(i);
+            List<int> noVisited = allCities.Where(x => !camino.Contains(x)).ToList();
+            
+            int minCost = int.MaxValue;
+            int[] real_way = new int[costos.Length];
+            
+            foreach (var item in noVisited)
+            {
+                if (step > 0) costo += costos[camino[step - 1], item];
+                camino[step] = item;
+                int thisWay = Naive_Traveling_Salesman_Problem_aux(costos, camino, step + 1, costo);
+                if (thisWay < minCost)
+                {
+                    minCost = thisWay;
+                    camino.CopyTo(real_way, 0);
+                }
+            }
+
+            camino = real_way;
+            return minCost;
+        }
 
         // Sorting
 
