@@ -38,7 +38,7 @@ namespace classic_computer_science_problems
             // "zzazz"
             */
 
-            Console.WriteLine(insercionesPalindromo2("leetcode"));
+            travelling_salesman_problem_codeforces();
 
             //Console.WriteLine(5 % 2);
             //Console.WriteLine(6 % 2);
@@ -200,35 +200,39 @@ namespace classic_computer_science_problems
         }
 
         /*
-         - costos es una matriz de nxn
          - Las ciudades son solo los indices de la matriz: 0,1,2,...n
          - El array camino inicialmente es 0,1,2...n
         */
-        static int Naive_Traveling_Salesman_Problem(int[,] costos, out int[] camino)
+        static int Naive_Travelling_Salesman_Problem(ICalculateCosto calculateCosto, int N,
+            out int[] camino, Func<int[], int, bool> parada)
         {
-            camino = new int[costos.Length];
-            for (int i = 0; i < costos.Length; i++) camino[i] = -1;
-            return Naive_Traveling_Salesman_Problem_aux(costos, camino, 0, 0);
+            camino = new int[N];
+            for (int i = 0; i < N; i++) camino[i] = -1;
+            return Naive_Travelling_Salesman_Problem_aux(calculateCosto, N, camino, 0, parada);
         }
 
-        static int Naive_Traveling_Salesman_Problem_aux(int[,] costos, int[] camino, int step, int costo)
+        static int Naive_Travelling_Salesman_Problem_aux(ICalculateCosto calculateCosto, int N,
+            int[] camino, int step, Func<int[], int, bool> parada)
         {
-            if (step == costos.Length) return costo;
+            if (step == camino.Length) return 0;
+            if (parada(camino, step)) return int.MaxValue;
 
             List<int> allCities = new List<int>();
-            for (int i = 0; i < costos.Length; i++) allCities.Add(i);
+            for (int i = 0; i < N; i++) allCities.Add(i);
             List<int> noVisited = allCities.Where(x => !camino.Contains(x)).ToList();
-            
+            noVisited.Add(0);
+
             int minCost = int.MaxValue;
-            int[] real_way = new int[costos.Length];
-            
+            int[] real_way = new int[camino.Length];
+
             foreach (var item in noVisited)
             {
-                if (step > 0) costo += costos[camino[step - 1], item];
                 camino[step] = item;
-                int thisWay = Naive_Traveling_Salesman_Problem_aux(costos, camino, step + 1, costo);
-                if (thisWay < minCost)
+                int thisWay = Naive_Travelling_Salesman_Problem_aux(calculateCosto, N, camino, step + 1, parada);
+                if (step > 0) thisWay += calculateCosto.Calculate(camino[step - 1], item);
+                if (thisWay < minCost && thisWay >= 0)
                 {
+                    //Console.WriteLine($"Encontramos un valor menor!! Que es {thisWay}");
                     minCost = thisWay;
                     camino.CopyTo(real_way, 0);
                 }
@@ -238,8 +242,68 @@ namespace classic_computer_science_problems
             return minCost;
         }
 
-        // Sorting
+        interface ICalculateCosto
+        {
+            int Calculate(int city1, int city2);
+        }
 
+        class CalculateCostoCodeforces : ICalculateCosto
+        {
+            List<Tuple<int, int>> costos;
+            public int Calculate(int city1, int city2)
+            {
+                int v = Math.Max(costos[city1].Item2, costos[city2].Item1 - costos[city1].Item1);
+                //Console.WriteLine($"Calculando costo desde {city1} a {city2} que da {v}");
+                return v;
+            }
+
+            public CalculateCostoCodeforces(List<Tuple<int,int>> costos)
+            {
+                this.costos = costos;
+            }
+        }
+
+        // https://codeforces.com/problemset/problem/1503/C
+        static void travelling_salesman_problem_codeforces()
+        {
+            int n;
+            int[] camino;
+            int.TryParse(Console.ReadLine().Split()[0], out n);
+            List<Tuple<int, int>> costos = new List<Tuple<int, int>>();
+            int j = n;
+            while (j > 0)
+            {
+                var values = Console.ReadLine().Split();
+                int ai;  int ci;
+                int.TryParse(values[0], out ai);
+                int.TryParse(values[1], out ci);
+
+                costos.Add(new Tuple<int, int>(ai, ci));
+                j--;
+            }
+
+            var calculateCosto = new CalculateCostoCodeforces(costos);
+            Func<int[], int, bool> parada = (int[] way, int step) =>
+              {
+                  if (step == 1) return false;
+                  if (step > 0 && way[step - 1] == 0) return true;
+                  else return false;
+              };
+
+            camino = new int[n + 1];
+            for (int i = 1; i < camino.Length; i++) camino[i] = -1;
+            
+            int sol = Naive_Travelling_Salesman_Problem_aux(calculateCosto, n, camino, 1, parada);
+            Console.WriteLine(sol);
+            foreach (var item in camino)
+            {
+                Console.Write($"{item} ");
+            }
+        }
+
+
+
+        // Sorting
         static void burbuja<T>(T[] array) where T:IComparable
         {
             for (int i = 0; i < array.Length; i++)
