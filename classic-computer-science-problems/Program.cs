@@ -202,25 +202,24 @@ namespace classic_computer_science_problems
         /*
          - Las ciudades son solo los indices de la matriz: 0,1,2,...n
          - El array camino inicialmente es 0,1,2...n
+         - Se puede hacer una optimizacion en cuanto a partir del paso en el q se este y las ciudades que 
+         falten por visitar para no repetir llamados.
         */
         static int Naive_Travelling_Salesman_Problem(ICalculateCosto calculateCosto, int N,
             out int[] camino, Func<int[], int, bool> parada)
         {
             camino = new int[N];
             for (int i = 0; i < N; i++) camino[i] = -1;
-            return Naive_Travelling_Salesman_Problem_aux(calculateCosto, N, camino, 0, parada);
+            List<int> allCities = new List<int>();
+            for (int i = 0; i < N; i++) allCities.Add(i);
+            return Naive_Travelling_Salesman_Problem_aux(calculateCosto, camino, 0, parada, allCities);
         }
 
-        static int Naive_Travelling_Salesman_Problem_aux(ICalculateCosto calculateCosto, int N,
-            int[] camino, int step, Func<int[], int, bool> parada)
+        static int Naive_Travelling_Salesman_Problem_aux(ICalculateCosto calculateCosto, int[] camino, 
+            int step, Func<int[], int, bool> parada, List<int> noVisited)
         {
             if (step == camino.Length) return 0;
             if (parada(camino, step)) return int.MaxValue;
-
-            List<int> allCities = new List<int>();
-            for (int i = 0; i < N; i++) allCities.Add(i);
-            List<int> noVisited = allCities.Where(x => !camino.Contains(x)).ToList();
-            noVisited.Add(0);
 
             int minCost = int.MaxValue;
             int[] real_way = new int[camino.Length];
@@ -228,7 +227,11 @@ namespace classic_computer_science_problems
             foreach (var item in noVisited)
             {
                 camino[step] = item;
-                int thisWay = Naive_Travelling_Salesman_Problem_aux(calculateCosto, N, camino, step + 1, parada);
+                var noVisitedNow = new List<int>(noVisited);
+                noVisitedNow.Remove(item);
+                //noVisited.Remove(item);
+                int thisWay = Naive_Travelling_Salesman_Problem_aux(calculateCosto, camino, step + 1, parada, noVisitedNow);
+                //noVisited.Add(item);
                 if (step > 0) thisWay += calculateCosto.Calculate(camino[step - 1], item);
                 if (thisWay < minCost && thisWay >= 0)
                 {
@@ -292,13 +295,17 @@ namespace classic_computer_science_problems
 
             camino = new int[n + 1];
             for (int i = 1; i < camino.Length; i++) camino[i] = -1;
-            
-            int sol = Naive_Travelling_Salesman_Problem_aux(calculateCosto, n, camino, 1, parada);
+
+            List<int> allCities = new List<int>();
+            for (int i = 0; i < n; i++) allCities.Add(i);
+            int sol = Naive_Travelling_Salesman_Problem_aux(calculateCosto, camino, 1, parada, allCities);
             Console.WriteLine(sol);
+            /*
             foreach (var item in camino)
             {
                 Console.Write($"{item} ");
             }
+            */
         }
 
 
