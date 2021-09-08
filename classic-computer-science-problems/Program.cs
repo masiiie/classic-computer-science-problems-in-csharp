@@ -37,8 +37,8 @@ namespace classic_computer_science_problems
             
             // "zzazz"
             */
-
-            travelling_salesman_problem_codeforces();
+            
+            //travelling_salesman_problem_codeforces();
 
             //Console.WriteLine(5 % 2);
             //Console.WriteLine(6 % 2);
@@ -199,53 +199,81 @@ namespace classic_computer_science_problems
             }
         }
 
+        static bool EqualList<T>(List<T> a, List<T> b) where T : IComparable
+        {
+            if (a.Count != b.Count) return false;
+            for (int i = 0; i < a.Count; i++) if (a[i].CompareTo(b[i]) != 0) return false;
+            return true;
+        }
+
         /*
          - Las ciudades son solo los indices de la matriz: 0,1,2,...n
          - El array camino inicialmente es 0,1,2...n
          - Se puede hacer una optimizacion en cuanto a partir del paso en el q se este y las ciudades que 
          falten por visitar para no repetir llamados.
         */
-        static int Naive_Travelling_Salesman_Problem(ICalculateCosto calculateCosto, int N,
-            out int[] camino, Func<int[], int, bool> parada)
+        public class Travelling_Salesman_Problem
         {
-            camino = new int[N];
-            for (int i = 0; i < N; i++) camino[i] = -1;
-            List<int> allCities = new List<int>();
-            for (int i = 0; i < N; i++) allCities.Add(i);
-            return Naive_Travelling_Salesman_Problem_aux(calculateCosto, camino, 0, parada, allCities);
-        }
-
-        static int Naive_Travelling_Salesman_Problem_aux(ICalculateCosto calculateCosto, int[] camino, 
-            int step, Func<int[], int, bool> parada, List<int> noVisited)
-        {
-            if (step == camino.Length) return 0;
-            if (parada(camino, step)) return int.MaxValue;
-
-            int minCost = int.MaxValue;
-            int[] real_way = new int[camino.Length];
-
-            foreach (var item in noVisited)
+            int[] camino;
+            ICalculateCosto calculateCosto;
+            int N;
+            public Travelling_Salesman_Problem(ICalculateCosto calculateCosto, int cantCiudades)
             {
-                camino[step] = item;
-                var noVisitedNow = new List<int>(noVisited);
-                noVisitedNow.Remove(item);
-                //noVisited.Remove(item);
-                int thisWay = Naive_Travelling_Salesman_Problem_aux(calculateCosto, camino, step + 1, parada, noVisitedNow);
-                //noVisited.Add(item);
-                if (step > 0) thisWay += calculateCosto.Calculate(camino[step - 1], item);
-                if (thisWay < minCost && thisWay >= 0)
-                {
-                    //Console.WriteLine($"Encontramos un valor menor!! Que es {thisWay}");
-                    minCost = thisWay;
-                    camino.CopyTo(real_way, 0);
-                }
+                this.calculateCosto = calculateCosto;
+                this.N = cantCiudades;
+                this.camino = new int[N];
+                for (int i = 0; i < N; i++) camino[i] = -1;
             }
 
-            camino = real_way;
-            return minCost;
-        }
+            public Travelling_Salesman_Problem(ICalculateCosto calculateCosto, int cantCiudades, 
+                int[] camino)
+            {
+                this.calculateCosto = calculateCosto;
+                this.N = cantCiudades;
+                this.camino = camino;
+            }
 
-        interface ICalculateCosto
+
+            public int calculate(ICalculateCosto calculateCosto, int N, Func<int[], int, bool> parada)
+            {
+                camino = new int[N];
+                for (int i = 0; i < N; i++) camino[i] = -1;
+                List<int> allCities = new List<int>();
+                for (int i = 0; i < N; i++) allCities.Add(i);
+                return calculate_aux(calculateCosto, 0, parada, allCities);
+            }
+
+            public int calculate_aux(ICalculateCosto calculateCosto, int step, Func<int[], int, bool> parada, List<int> noVisited)
+            {
+                if (step == camino.Length) return 0;
+                if (parada(camino, step)) return int.MaxValue;
+
+                int minCost = int.MaxValue;
+                int[] real_way = new int[camino.Length];
+
+                foreach (var item in noVisited)
+                {
+                    camino[step] = item;
+                    var noVisitedNow = new List<int>(noVisited);
+                    noVisitedNow.Remove(item);
+                    //noVisited.Remove(item);
+                    int thisWay = calculate_aux(calculateCosto, step + 1, parada, noVisitedNow);
+                    //noVisited.Add(item);
+                    if (step > 0) thisWay += calculateCosto.Calculate(camino[step - 1], item);
+                    if (thisWay < minCost && thisWay >= 0)
+                    {
+                        //Console.WriteLine($"Encontramos un valor menor!! Que es {thisWay}");
+                        minCost = thisWay;
+                        camino.CopyTo(real_way, 0);
+                    }
+                }
+
+                camino = real_way;
+                return minCost;
+            }
+        }        
+
+        public interface ICalculateCosto
         {
             int Calculate(int city1, int city2);
         }
@@ -298,7 +326,8 @@ namespace classic_computer_science_problems
 
             List<int> allCities = new List<int>();
             for (int i = 0; i < n; i++) allCities.Add(i);
-            int sol = Naive_Travelling_Salesman_Problem_aux(calculateCosto, camino, 1, parada, allCities);
+            var problem = new Travelling_Salesman_Problem(calculateCosto, n, camino);
+            int sol = problem.calculate_aux(calculateCosto, 1, parada, allCities);
             Console.WriteLine(sol);
             /*
             foreach (var item in camino)
@@ -308,10 +337,8 @@ namespace classic_computer_science_problems
             */
         }
 
-
-
         // Sorting
-        static void burbuja<T>(T[] array) where T:IComparable
+        static void bubble_sorting<T>(T[] array) where T:IComparable
         {
             for (int i = 0; i < array.Length; i++)
             {
