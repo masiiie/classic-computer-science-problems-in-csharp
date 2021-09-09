@@ -1,0 +1,18 @@
+travelling_salesman_problem
+
+3
+1 9
+2 1
+4 1
+
+output: 11
+
+
+6
+4 2
+8 4
+3 0
+2 3
+7 1
+0 1
+output: 13

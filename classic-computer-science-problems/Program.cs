@@ -38,7 +38,7 @@ namespace classic_computer_science_problems
             // "zzazz"
             */
             
-            //travelling_salesman_problem_codeforces();
+            travelling_salesman_problem_codeforces();
 
             //Console.WriteLine(5 % 2);
             //Console.WriteLine(6 % 2);
@@ -217,12 +217,18 @@ namespace classic_computer_science_problems
             int[] camino;
             ICalculateCosto calculateCosto;
             int N;
+            Dictionary<List<int>, Tuple<int,int[]>> llamados;
+            void initialize_llamados()
+            {
+                this.llamados = new Dictionary<List<int>, Tuple<int, int[]>>();
+            }
             public Travelling_Salesman_Problem(ICalculateCosto calculateCosto, int cantCiudades)
             {
                 this.calculateCosto = calculateCosto;
                 this.N = cantCiudades;
                 this.camino = new int[N];
                 for (int i = 0; i < N; i++) camino[i] = -1;
+                initialize_llamados();
             }
 
             public Travelling_Salesman_Problem(ICalculateCosto calculateCosto, int cantCiudades, 
@@ -231,10 +237,11 @@ namespace classic_computer_science_problems
                 this.calculateCosto = calculateCosto;
                 this.N = cantCiudades;
                 this.camino = camino;
+                initialize_llamados();
             }
 
 
-            public int calculate(ICalculateCosto calculateCosto, int N, Func<int[], int, bool> parada)
+            public Tuple<int, int[]> calculate(ICalculateCosto calculateCosto, int N, Func<int[], int, bool> parada)
             {
                 camino = new int[N];
                 for (int i = 0; i < N; i++) camino[i] = -1;
@@ -243,13 +250,25 @@ namespace classic_computer_science_problems
                 return calculate_aux(calculateCosto, 0, parada, allCities);
             }
 
-            public int calculate_aux(ICalculateCosto calculateCosto, int step, Func<int[], int, bool> parada, List<int> noVisited)
+            public Tuple<int, int[]> calculate_aux(ICalculateCosto calculateCosto, int step, Func<int[], int, bool> parada, List<int> noVisited)
             {
-                if (step == camino.Length) return 0;
-                if (parada(camino, step)) return int.MaxValue;
+                if (step == camino.Length) return new Tuple<int, int[]>(0, new int[0]);
+                if (parada(camino, step)) return new Tuple<int, int[]>(int.MaxValue, new int[0]);
+
+                var stringNoVisited = "";
+                foreach (var item in noVisited) stringNoVisited += $"{item} ";
+
+                var existent = this.llamados.Keys.Where(x => EqualList(x, noVisited)).ToList();
+                if (existent.Count > 0)
+                {
+                    //Console.WriteLine($"Camino visto. step: {step}  noVisited: {stringNoVisited}");
+                    return this.llamados[existent[0]];
+                }
+
+                //Console.WriteLine($"    Step: {step}  noVisited: {stringNoVisited}");
 
                 int minCost = int.MaxValue;
-                int[] real_way = new int[camino.Length];
+                int[] real_way = new int[camino.Length - step];
 
                 foreach (var item in noVisited)
                 {
@@ -257,19 +276,25 @@ namespace classic_computer_science_problems
                     var noVisitedNow = new List<int>(noVisited);
                     noVisitedNow.Remove(item);
                     //noVisited.Remove(item);
-                    int thisWay = calculate_aux(calculateCosto, step + 1, parada, noVisitedNow);
+                    var solThisWay = calculate_aux(calculateCosto, step + 1, parada, noVisitedNow);
+                    int thisWay = solThisWay.Item1;
                     //noVisited.Add(item);
-                    if (step > 0) thisWay += calculateCosto.Calculate(camino[step - 1], item);
+
+                    if (solThisWay.Item2.Length > 0)
+                        thisWay += calculateCosto.Calculate(item, solThisWay.Item2[0]);
+
                     if (thisWay < minCost && thisWay >= 0)
                     {
-                        //Console.WriteLine($"Encontramos un valor menor!! Que es {thisWay}");
+                        Console.WriteLine($"Encontramos un valor menor!! Que es {thisWay}");
                         minCost = thisWay;
-                        camino.CopyTo(real_way, 0);
+                        real_way[0] = item;
+                        solThisWay.Item2.CopyTo(real_way, 1);
                     }
                 }
 
-                camino = real_way;
-                return minCost;
+                this.llamados[noVisited] = new Tuple<int, int[]>(minCost, real_way);
+                real_way.CopyTo(camino, step);
+                return this.llamados[noVisited];
             }
         }        
 
@@ -283,8 +308,8 @@ namespace classic_computer_science_problems
             List<Tuple<int, int>> costos;
             public int Calculate(int city1, int city2)
             {
+                //Console.WriteLine($"Calculando costo desde {city1} a {city2}");
                 int v = Math.Max(costos[city1].Item2, costos[city2].Item1 - costos[city1].Item1);
-                //Console.WriteLine($"Calculando costo desde {city1} a {city2} que da {v}");
                 return v;
             }
 
@@ -327,8 +352,8 @@ namespace classic_computer_science_problems
             List<int> allCities = new List<int>();
             for (int i = 0; i < n; i++) allCities.Add(i);
             var problem = new Travelling_Salesman_Problem(calculateCosto, n, camino);
-            int sol = problem.calculate_aux(calculateCosto, 1, parada, allCities);
-            Console.WriteLine(sol);
+            var sol = problem.calculate_aux(calculateCosto, 1, parada, allCities);
+            Console.WriteLine(sol.Item1);
             /*
             foreach (var item in camino)
             {
